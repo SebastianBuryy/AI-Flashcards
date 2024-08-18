@@ -18,7 +18,12 @@ module.exports = {
     },
     extend: {
       boxShadow: {
-        'xs': '0 4px 8px 0 rgba(255, 69, 0, 1)',
+        'xs': '0 4px 8px 0 rgba(249, 115, 22, 1)',
+        'sm': '0px 0px 15px 0px rgba(249, 115, 22, 1)',
+        'md': '0px 2px 8px 2px rgba(0, 0, 0, 0.15)',
+      },
+      dropShadow: {
+        'md': '0 2px 4px rgba(249, 115, 22, 1)',
       },
       colors: {
         border: "hsl(var(--border))",
