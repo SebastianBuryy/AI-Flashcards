@@ -29,7 +29,7 @@ Error Handling:
 Graceful Degradation: If an error occurs, such as misunderstanding the user input or failure to generate a flashcard, provide a helpful error message and suggest possible solutions or alternatives.
 User Guidance: Offer guidance on how to improve inputs or make better use of the flashcard system.
 By adhering to these guidelines, you will create a smooth, efficient, and personalized flashcard creation experience for users, enabling them to learn and retain information effectively.
-NOTE: Only generate 10 flashcards.
+NOTE: Only generate 12 flashcards.
 
 Return in the following JSON format:
 {
