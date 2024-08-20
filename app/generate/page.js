@@ -1,237 +1,3 @@
-// 'use client';
-
-// import { Card, CardContent } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { useUser } from "@clerk/nextjs";
-// import { useRouter } from "next/navigation";
-// import { Textarea } from "@/components/ui/textarea"
-// import { useState, useEffect } from "react";
-// import Link from "next/link";
-// import { TbCardsFilled } from "react-icons/tb";
-// import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-
-// import "/app/globals.css";
-// import {
-//     Dialog,
-//     DialogContent,
-//     DialogDescription,
-//     DialogHeader,
-//     DialogTitle,
-//     DialogTrigger,
-//     DialogFooter,
-// } from "@/components/ui/dialog";
-// import { db } from "@/firebase";
-// import { collection, doc, getDoc, getDocs, setDoc, writeBatch } from "firebase/firestore";
-
-
-// export default function Generate() {
-//     const { isLoaded, isSignedIn, user } = useUser();
-//     const [flashcards, setFlashcards] = useState([]);
-//     const [flipped, setFlipped] = useState([]);
-//     const [text, setText] = useState("");
-//     const [name, setName] = useState("");
-//     const [open, setOpen] = useState(false);
-//     const router = useRouter();
-
-//     const handleSubmit = async () => {
-//         fetch('api/generate', {
-//             method: 'POST',
-//             body: text,
-//         }).then(response => response.json())
-//             .then((data) => {
-//                 setFlashcards(data);
-//             })
-//     }
-
-//     const handleCardClick = (id) => {
-//         setFlipped((prev) => ({
-//             ...prev,
-//             [id]: !prev[id]
-//         }))
-//     }
-
-//     const handleOpen = () => {
-//         setOpen(true);
-//     }
-
-//     const handleClose = () => {
-//         setOpen(false);
-//     }
-
-//     const saveFlashcards = async () => {
-//         if (!name) {
-//             alert("Please enter a name.");
-//             return;
-//         }
-
-//         const batch = writeBatch(db);
-//         const userDocRef = doc(collection(db, "users"), user.id);
-//         const docSnap = await getDoc(userDocRef);
-
-//         if (docSnap.exists()) {
-//             const collections = docSnap.data().flashcards || [];
-//             if (collections.find((f) => f.name === name)) {
-//                 alert("Flashcard collection with that name already exists.");
-//                 return;
-//             }
-//             else {
-//                 collections.push({ name });
-//                 batch.set(userDocRef, { flashcards: collections }, { merge: true });
-//             }
-
-//         } else {
-//             batch.set(userDocRef, { flashcards: [{ name }] });
-//         }
-
-//         const colRef = collection(userDocRef, name);
-//         flashcards.forEach((flashcard) => {
-//             const cardDocRef = doc(colRef);
-//             batch.set(cardDocRef, flashcard);
-//         });
-
-//         await batch.commit();
-//         handleClose();
-//         router.push("/flashcards");
-//     }
-
-//     return (
-//         <div className="w-full">
-//             <nav className="w-full">
-//                 <div className="w-full bg-white shadow-xs mx-auto flex justify-between items-center py-4 px-6">
-//                     <div className="max-w-[300px] flex items-center space-x-2">
-//                         <Link className="flex items-center space-x-2" href="/">
-//                             <TbCardsFilled className="w-10 h-10 text-orange-500" />
-//                             <h2 className="text-xl text-black font-bold">Flashcard AI</h2>
-//                         </Link>
-//                     </div>
-//                     <div className="space-x-2">
-//                         <SignedIn>
-//                             <UserButton />
-//                         </SignedIn>
-//                         <SignedOut>
-//                             <Button asChild variant="default" className="text-md font-bold">
-//                                 <Link href="/sign-in">Login</Link>
-//                             </Button>
-//                             <Button asChild variant="default" className="text-md font-bold">
-//                                 <Link href="/sign-up">Sign Up</Link>
-//                             </Button>
-//                         </SignedOut>
-//                     </div>
-//                 </div>
-//             </nav>
-
-//             <div className="flex flex-col items-center min-h-screen p-4">
-//                 <div className="max-w-xl w-full mb-6">
-//                     <text className="text-3xl text-center">Generate Flashcards</text>
-//                     <Card className="mt-4 p-4 w-full border-2 border-black">
-//                         <CardContent>
-//                             <Textarea
-//                                 className="mb-4"
-//                                 value={text}
-//                                 onChange={(e) => setText(e.target.value)}
-//                                 label="Text"
-//                                 placeholder="Enter text"
-//                                 rows={4}
-//                             />
-//                             <Button
-//                                 className="bg-orange-500 w-full"
-//                                 onClick={handleSubmit}
-//                             >
-//                                 Submit
-//                             </Button>
-//                         </CardContent>
-//                     </Card>
-//                 </div>
-
-//                 {flashcards.length > 0 && (
-//                     <div className="max-w-4xl w-full">
-//                         <text className="text-md block mb-2">Flashcards Preview</text>
-//                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-//                             {flashcards.map((flashcard, index) => (
-//                                 <Card
-//                                     key={index}
-//                                     className="border-2 border-black"
-//                                     onClick={() => handleCardClick(index)}
-//                                 >
-//                                     <div
-//                                         style={{
-//                                             perspective: '1000px', // Enable 3D space for child elements
-//                                         }}
-//                                     >
-//                                         <div
-//                                             style={{
-//                                                 transition: 'transform 0.65s',
-//                                                 transformStyle: 'preserve-3d',
-//                                                 position: 'relative',
-//                                                 width: '100%',
-//                                                 height: '200px',
-//                                                 boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
-//                                                 transform: flipped[index] ? 'rotateY(180deg)' : 'rotateY(0)',
-//                                             }}
-//                                         >
-//                                             <div
-//                                                 style={{
-//                                                     position: 'absolute',
-//                                                     width: '100%',
-//                                                     height: '100%',
-//                                                     backfaceVisibility: 'hidden',
-//                                                     display: 'flex',
-//                                                     alignItems: 'center',
-//                                                     justifyContent: 'center',
-//                                                 }}
-//                                             >
-//                                                 {flashcard.front}
-//                                             </div>
-//                                             <div
-//                                                 style={{
-//                                                     position: 'absolute',
-//                                                     width: '100%',
-//                                                     height: '100%',
-//                                                     backfaceVisibility: 'hidden',
-//                                                     display: 'flex',
-//                                                     alignItems: 'center',
-//                                                     justifyContent: 'center',
-//                                                     transform: 'rotateY(180deg)',
-//                                                 }}
-//                                             >
-//                                                 {flashcard.back}
-//                                             </div>
-//                                         </div>
-//                                     </div>
-//                                 </Card>
-//                             ))}
-//                         </div>
-//                     </div>
-//                 )}
-
-//                 <div className="flex space-x-4 mt-6">
-//                     <Button className="bg-orange-500" onClick={handleOpen}>Save</Button>
-//                 </div>
-
-//                 <Dialog open={open} onClose={handleClose}>
-//                     <DialogContent>
-//                         <DialogTitle>Save Flashcards</DialogTitle>
-//                         <DialogDescription>Enter a name for your flashcard collection</DialogDescription>
-//                         <Textarea
-//                             autoFocus
-//                             type="text"
-//                             className="mb-2"
-//                             value={name}
-//                             onChange={(e) => setName(e.target.value)}
-//                             label="Collection Name"
-//                             placeholder="Enter name"
-//                         />
-//                         <DialogFooter>
-//                             <Button className="bg-orange-500" onClick={saveFlashcards}>Save</Button>
-//                             <Button className="bg-gray-500" onClick={handleClose}>Cancel</Button>
-//                         </DialogFooter>
-//                     </DialogContent>
-//                 </Dialog>
-//             </div>
-//         </div>
-//     )
-// }
-
 'use client';
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -260,10 +26,7 @@ import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
 
 import { useDropzone } from "react-dropzone";
-import { PDFDocument, getTextContent } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist/build/pdf';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+import pdfToText from "react-pdftotext";
 import Tesseract from 'tesseract.js';
 
 export default function Generate() {
@@ -276,16 +39,7 @@ export default function Generate() {
     const [open, setOpen] = useState(false);
     const router = useRouter();
     const [files, setFiles] = useState([]);
-
-    // const handleSubmit = async () => {
-    //     fetch('api/generate', {
-    //         method: 'POST',
-    //         body: text,
-    //     }).then(response => response.json())
-    //         .then((data) => {
-    //             setFlashcards(data);
-    //         });
-    // };
+    const [animationDirection, setAnimationDirection] = useState("");
 
     const handleSubmit = async () => {
         if (files.length > 0) {
@@ -297,20 +51,10 @@ export default function Generate() {
                 const reader = new FileReader();
 
                 reader.onload = async (event) => {
-                    const typedArray = new Uint8Array(event.target.result);
-
-                    // Use pdfjsLib to load and extract text from the PDF
-                    const pdfDoc = await pdfjsLib.getDocument(typedArray).promise;
-                    const textArray = await Promise.all(
-                        pdfDoc._pdfInfo.numPages.map(async (pageNum) => {
-                            const page = await pdfDoc.getPage(pageNum);
-                            const textContent = await page.getTextContent();
-                            return textContent.items.map(item => item.str).join(' ');
-                        })
-                    );
-                    const extractedText = textArray.join(' ');
-
-                    sendToBackend({ text: extractedText });
+                    pdfToText(file)
+                        .then(function (text) {
+                            sendToBackend({ text });
+                        });
                 };
 
                 reader.readAsArrayBuffer(file);
@@ -359,13 +103,21 @@ export default function Generate() {
     };
 
     const handleNextCard = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % flashcards.length);
-        setFlipped(false);
+        setAnimationDirection("next");
+        setTimeout(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % flashcards.length);
+            setAnimationDirection("");
+            setFlipped(false);
+        }, 500);
     };
 
     const handlePrevCard = () => {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + flashcards.length) % flashcards.length);
-        setFlipped(false);
+        setAnimationDirection("prev");
+        setTimeout(() => {
+            setCurrentIndex((prevIndex) => (prevIndex - 1 + flashcards.length) % flashcards.length);
+            setAnimationDirection("");
+            setFlipped(false);
+        }, 500);
     };
 
     const handleOpen = () => {
@@ -423,7 +175,7 @@ export default function Generate() {
     });
 
     return (
-        <div className="w-full">
+        <div className="w-full bg-orange-100">
             <nav className="w-full">
                 <div className="w-full bg-white shadow-xs mx-auto flex justify-between items-center py-4 px-6">
                     <div className="max-w-[300px] flex items-center space-x-2">
@@ -452,9 +204,9 @@ export default function Generate() {
                 <div className="max-w-xl w-full mb-6">
                     <h2 className="text-2xl font-bold text-center">Create Flashcards</h2>
                     <hr className="w-1/4 mx-auto border-2 border-orange-500 mt-2" />
-                    <Card className="mt-4 p-4 w-full shadow-md">
+                    <Card className="mt-4 p-4 pt-6 w-full shadow-md">
                         <CardContent>
-                            <Label className="text-md font-bold">Files</Label>
+                            <Label className="text-md font-bold">File</Label>
                             <div {...getRootProps()} className="mt-0 mb-2 p-4 border-dashed border-2 border-gray-300 rounded-lg text-center">
                                 <input {...getInputProps()} />
                                 <p>Drag and drop or <span className="font-bold text-orange-500">browse</span> to upload</p>
@@ -472,7 +224,7 @@ export default function Generate() {
                             )}
                             <Label className="text-md font-bold">Text</Label>
                             <Textarea
-                                className="mb-4 ring-black hover:ring-none focus:ring-none"
+                                className="mb-4 border-2 ring-black hover:ring-none focus:ring-none"
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
                                 label="Text"
@@ -495,14 +247,15 @@ export default function Generate() {
                         <hr className="w-1/4 mx-auto border-2 border-orange-500 mt-2 mb-4" />
                         <div className="flex flex-col items-center">
                             <div
-                                className="relative w-full h-72"
-                                // style={{
-                                //     perspective: '1000px',
-                                // }}
+                                className={`relative w-full h-72 hover:cursor-pointer 
+                                    ${animationDirection === 'next' ? 'animate-slideOutLeft' : ''} 
+                                    ${animationDirection === 'prev' ? 'animate-slideOutRight' : ''}`}
                                 onClick={handleCardClick}
                             >
                                 <div
-                                    className="absolute inset-0 rounded-full"
+                                    className={`absolute inset-0 rounded-full
+                                        ${animationDirection === 'next' ? 'animate-slideInRight' : ''} 
+                                        ${animationDirection === 'prev' ? 'animate-slideInLeft' : ''}`}
                                     style={{
                                         transition: 'transform 0.65s',
                                         transformStyle: 'preserve-3d',
@@ -536,39 +289,40 @@ export default function Generate() {
                                     </Card>
                                 </div>
                             </div>
-                            <div className="flex space-x-4 mt-4">
+                            <div className="flex space-x-4 mt-4 items-center">
                                 <Button variant="default" size="icon" className="" onClick={handlePrevCard}>
                                     <FaRegArrowAltCircleLeft className="w-6 h-6" />
                                 </Button>
+                                <span className="text-md font-bold">
+                                    {currentIndex + 1} / {flashcards.length}
+                                </span>
                                 <Button variant="default" size="icon" onClick={handleNextCard}>
                                     <FaRegArrowAltCircleRight className="w-6 h-6" />
                                 </Button>
+                            </div>
+                            <div className="flex space-x-4 mt-6">
+                                <Button className="bg-orange-500 font-bold" onClick={handleOpen}>Save</Button>
                             </div>
                         </div>
                     </div>
                 )}
 
-
-                <div className="flex space-x-4 mt-6">
-                    <Button className="bg-orange-500" onClick={handleOpen}>Save</Button>
-                </div>
-
                 <Dialog open={open} onClose={handleClose}>
-                    <DialogContent>
+                    <DialogContent className="border-2 shadow-sm border-orange-500 bg-neutral-50">
                         <DialogTitle>Save Flashcards</DialogTitle>
-                        <DialogDescription>Enter a name for your flashcard collection</DialogDescription>
+                        <DialogDescription>Enter a name for your flashcard deck</DialogDescription>
                         <Textarea
                             autoFocus
                             type="text"
-                            className="mb-2"
+                            className="mb-2 border-2"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             label="Collection Name"
-                            placeholder="Enter name"
+                            placeholder="Enter name here..."
                         />
                         <DialogFooter>
                             <Button className="bg-orange-500" onClick={saveFlashcards}>Save</Button>
-                            <Button className="bg-gray-500" onClick={handleClose}>Cancel</Button>
+                            <Button className="bg-white text-black" onClick={handleClose}>Cancel</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>

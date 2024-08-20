@@ -190,11 +190,11 @@ export default function Home() {
           <Label htmlFor="payment-schedule" className="me-3">
             Monthly
           </Label>
-          <Switch id="payment-schedule" />
+          <Switch id="payment-schedule" className="shadow-none" />
           <Label htmlFor="payment-schedule" className="relative ms-3">
             Annual
-            <span className="absolute -top-10 start-auto -end-28">
-              <span className="flex items-center">
+            <span className="absolute -top-10 start-auto -end-28 shadow-none">
+              <span className="flex items-center shadow-none">
                 <svg
                   className="w-14 h-8 -me-6"
                   width={45}
@@ -244,7 +244,9 @@ export default function Home() {
             </CardContent>
             <CardFooter>
               <Button className="w-full" variant={"outline"}>
-                Choose Free
+                <Link href="/sign-up">
+                  Choose Free
+                </Link>
               </Button>
             </CardFooter>
           </Card>

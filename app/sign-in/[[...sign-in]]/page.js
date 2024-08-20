@@ -25,6 +25,7 @@ export default function SignInPage() {
 
             <div className="md:mt-36 md:mb-0 mb-20 mt-20 flex flex-col items-center justify-center">
                 <SignIn
+                    forceRedirectUrl="/flashcards"
                     appearance={{
                         elements: {
                             formButtonPrimary: 'bg-orange-500 hover:bg-orange-400 text-white border-none rounded-full',

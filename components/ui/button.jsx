@@ -16,7 +16,7 @@ const buttonVariants = cva(
         outline:
           "transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-105 duration-300 mt-4 text-orange-500 text-md font-bold border-2 border-orange-500 rounded-full hover:shadow-sm hover:bg-orange-500 hover:text-white",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "transition ease-in-out delay-50 bg-orange-500 border-2 border-orange-500 rounded-full text-white hover:shadow-sm duration-300",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
